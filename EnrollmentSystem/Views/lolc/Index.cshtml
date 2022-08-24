@@ -1,0 +1,132 @@
+﻿@{ 
+    ViewBag.Title = "View1";
+    Layout = "~/Views/Shared/styles.cshtml";
+}
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="container">
+                    @using(Html.BeginForm("save", "lolc", FormMethod.Post))
+                    {
+                        <div class="form-group">
+                            <div>
+                                <label class="form-label">Course Name</label>
+                                <input type="text" name="name" id="name" class="form-control" placeholder="Course Name" />
+                            </div>
+                            <div>
+                                <label class="form-label">Fee</label>
+                                <input type="text" name="fee" id="fee" class="form-control" placeholder="Fee" />
+                            </div>
+                            <div>
+                                <button type="button" id="save" class="btn btn-info" onclick="addProject()">Add</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="col-sm-8">
+                <div class="panel-body">
+                    <table id="tbl-school" class="table table-bordered" cellspacing="0" align="center">
+                        <thead>
+                            <tr>
+                                <th>Course name</th>
+                                <th>Fee</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+@section Scripts
+{
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+
+<script>
+    getall()
+
+    var isNew = true;
+
+    function addProject() {
+        var url = '';
+        var data = '';
+        var method;
+
+        if (isNew == true) {
+            url = '/lolc/save';
+            data = "{coursename:'" + $('#name').val() + "', fee:'" + $('#fee').val() + "'}";
+            method = 'Post';
+        }
+
+        $.ajax({
+
+            type: method,
+            url: url,
+            dataType: 'JSON',
+            contentType: "application/json; charset=utf-8",
+            data: data,
+            
+            success: function (data) {
+                if (isNew) {
+                    alert("success");
+                }
+                
+            }
+
+        });
+    }
+
+    function getall() {
+        $('#tbl-school').dataTable().fnDestroy();
+        $('#tbl-school').DataTable({
+            "ajax": {
+                "url": '/lolc/GetCourses',
+                "type": "get",
+                "datatype": "JSON"
+            },
+
+            "columns": 
+                [
+                    { data: "coursename" },
+                    { data: "fee" },
+                        { 
+                            data: "id", "render": function(data)
+                            {
+                                return '<button clas= "btn btn-success" onclick= "get_course('+data+')">Edit</button>';
+                            }
+                        },
+
+                      { 
+                          data: "id", "render": function(data){
+                              return '<button clas= "btn btn-danger" onclick= "get_delete('+data+')">Delete</button>';
+                          }
+                      }
+                ]
+
+        })
+    }
+
+    function get_course(id) {
+        $.ajax({
+            type: 'GET',
+            url: '/lolc/Edit?ID=' + id,
+            dataType: 'JSON',
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                isNew = false;
+
+                ID = data.id;
+                $('#name').val(data.coursename);
+                $('#fee').val(data.fee);
+            }
+            
+        });
+    }
+
+</script>
+
+
+}
