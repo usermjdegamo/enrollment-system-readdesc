@@ -27,6 +27,14 @@ namespace EnrollmentSystem.Controllers
 
         }
 
+        [HttpGet]
+        public JsonResult Edit(int id)
+        {
+
+            var course = db.records.Where(a => a.Id == id).FirstOrDefault();
+
+            return Json(course, JsonRequestBehavior.AllowGet);
+        }
 
         public ActionResult save(record rec)
         {
